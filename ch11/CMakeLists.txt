@@ -1,0 +1,5 @@
+add_executable(shutdown_client shutdown_client.c)
+target_link_libraries(shutdown_client tcp_ip_common)
+
+add_executable(shutdown_server shutdown_server.c)
+target_link_libraries(shutdown_server tcp_ip_common)

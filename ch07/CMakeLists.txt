@@ -1,0 +1,11 @@
+add_executable(local_dgram_client local_socket_dgram_client.c)
+target_link_libraries(local_dgram_client tcp_ip_common)
+
+add_executable(local_dgram_server local_socket_dgram_server.c)
+target_link_libraries(local_dgram_server tcp_ip_common)
+
+add_executable(local_stream_client local_socket_stream_client.c)
+target_link_libraries(local_stream_client tcp_ip_common)
+
+add_executable(local_stream_server local_socket_stream_server.c)
+target_link_libraries(local_stream_server tcp_ip_common)

@@ -1,0 +1,5 @@
+add_executable(socket_client socket_client.c)
+target_link_libraries(socket_client tcp_ip_common)
+
+add_executable(socket_server socket_server.c)
+target_link_libraries(socket_server tcp_ip_common)
