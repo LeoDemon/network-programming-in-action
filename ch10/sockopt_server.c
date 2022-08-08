@@ -25,7 +25,7 @@ void read_data(int sockfd) {
         } else if (n < 0) {
             if (EINTR == errno) {
                 // 非阻塞情况，继续 read
-                return;
+                continue;
             }
             error_logging(stderr, "read from socket error");
             return;
