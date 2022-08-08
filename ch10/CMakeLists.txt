@@ -1,0 +1,5 @@
+add_executable(sockopt_client sockopt_client.c)
+target_link_libraries(sockopt_client tcp_ip_common)
+
+add_executable(sockopt_server sockopt_server.c)
+target_link_libraries(sockopt_server tcp_ip_common)
