@@ -29,8 +29,12 @@ void send_data(int sockfd) {
         break;
     }
 
-    const char *cp = query;
     size_t remaining = strlen(query);
+    if ('\n' == query[remaining - 1]) {
+        query[remaining-1] = '\0';
+    }
+
+    const char *cp = query;
     while (remaining) {
         ssize_t n_written = send(sockfd, cp, remaining, 0);
         fprintf(stdout, "send into buffer %ld \n", n_written);

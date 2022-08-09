@@ -15,7 +15,7 @@ void read_data(int sockfd) {
     ssize_t n;
     char buf[1024];
 
-    for(;;) {
+    for (;;) {
         bzero(buf, sizeof(buf));
         n = read(sockfd, buf, 1024);
         if (n == 0) {
@@ -29,6 +29,9 @@ void read_data(int sockfd) {
             }
             error_logging(stderr, "read from socket error");
             return;
+        }
+        if ('\n' == buf[n - 1]) {
+            buf[n-1] = '\0';
         }
         printf("read data: [%s]\n", buf);
     }
