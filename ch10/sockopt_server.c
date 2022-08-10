@@ -33,7 +33,7 @@ void read_data(int sockfd) {
         if ('\n' == buf[n - 1]) {
             buf[n-1] = '\0';
         }
-        printf("read data: [%s]\n", buf);
+        printf("read data: [%s], size: [%lu]\n", buf, strlen(buf));
     }
 }
 

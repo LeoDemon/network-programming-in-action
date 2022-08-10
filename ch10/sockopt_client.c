@@ -29,13 +29,22 @@ void send_data(int sockfd) {
         break;
     }
 
+    // `long` vs `size_t`
+    // long remaining = (long) strlen(query);
     size_t remaining = strlen(query);
     if ('\n' == query[remaining - 1]) {
-        query[remaining-1] = '\0';
+        query[remaining - 1] = '\0';
     }
+    remaining = (long) strlen(query);
 
     const char *cp = query;
+    // `remaining > 0` vs `remaining`
+    // while (remaining > 0) {
     while (remaining) {
+        // `100` vs `remaining`: if using `100` or other number instead of `remaining`,
+        // please remind to modify `size_t remaining` --> `long remaining`,
+        // and modify `while (remaining)` --> `while (remaining > 0)`
+        // ssize_t n_written = send(sockfd, cp, 100, 0);
         ssize_t n_written = send(sockfd, cp, remaining, 0);
         fprintf(stdout, "send into buffer %ld \n", n_written);
         if (n_written < 0) {
@@ -43,7 +52,8 @@ void send_data(int sockfd) {
             break;
         }
         remaining -= n_written;
-        cp += +n_written;
+        cp += n_written;
+        printf("remaining: [%ld], cp: [%s]\n", remaining, cp);
     }
     printf("send data [%s] end...\n", query);
 }
