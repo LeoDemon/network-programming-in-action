@@ -30,7 +30,7 @@ void send_data(int sockfd) {
             break;
         }
         remaining -= n_written;
-        cp += +n_written;
+        cp += n_written;
     }
     free(query);
 }
