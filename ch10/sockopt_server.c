@@ -13,28 +13,36 @@
 
 void read_data(int sockfd) {
     ssize_t n;
-    char buf[1024];
+    char buf[102400];
 
+//    printf("input> ");
+//    getchar();
+
+    long total = 0;
     for (;;) {
         bzero(buf, sizeof(buf));
-        n = read(sockfd, buf, 1024);
+        n = read(sockfd, buf, 102400);
         if (n == 0) {
             // End-of-File，表示 socket 关闭
-            printf("client socket closed\n");
-            return;
+            logging("client socket closed");
+            break;
         } else if (n < 0) {
             if (EINTR == errno) {
                 // 非阻塞情况，继续 read
                 continue;
             }
             error_logging(stderr, "read from socket error");
-            return;
+            break;
         }
-        if ('\n' == buf[n - 1]) {
-            buf[n-1] = '\0';
+        if (total <= 0) {
+            sleep(2);
         }
-        printf("read data: [%s], size: [%lu]\n", buf, strlen(buf));
+        total += n;
     }
+    char msg[100];
+    bzero(msg, sizeof(msg));
+    sprintf(msg, "read data size: [%ld]", total);
+    logging(msg);
 }
 
 int main(int argc, char **argv) {

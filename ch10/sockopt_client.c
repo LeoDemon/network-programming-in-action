@@ -11,52 +11,11 @@
 #include <errno.h>
 #include "common/log.h"
 
-# define MESSAGE_SIZE 1024
+# define MESSAGE_SIZE 1024000
 
 void set_socket(int sock_fd, int linger_flag);
 
 void display_socket_opt(int sock_fd);
-
-void send_data(int sockfd) {
-    char query[MESSAGE_SIZE];
-    bzero(query, sizeof(query));
-    for (;;) {
-        if (fgets(query, MESSAGE_SIZE, stdin) == NULL) {
-            int err_no = ferror(stdin);
-            printf("invalid input from stdin: %d, %s\n", err_no, strerror(err_no));
-            continue;
-        }
-        break;
-    }
-
-    // `long` vs `size_t`
-    // long remaining = (long) strlen(query);
-    size_t remaining = strlen(query);
-    if ('\n' == query[remaining - 1]) {
-        query[remaining - 1] = '\0';
-    }
-    remaining = (long) strlen(query);
-
-    const char *cp = query;
-    // `remaining > 0` vs `remaining`
-    // while (remaining > 0) {
-    while (remaining) {
-        // `100` vs `remaining`: if using `100` or other number instead of `remaining`,
-        // please remind to modify `size_t remaining` --> `long remaining`,
-        // and modify `while (remaining)` --> `while (remaining > 0)`
-        // ssize_t n_written = send(sockfd, cp, 100, 0);
-        ssize_t n_written = send(sockfd, cp, remaining, 0);
-        fprintf(stdout, "send into buffer %ld \n", n_written);
-        if (n_written < 0) {
-            error_handling(stderr, "send failed");
-            break;
-        }
-        remaining -= n_written;
-        cp += n_written;
-        printf("remaining: [%ld], cp: [%s]\n", remaining, cp);
-    }
-    printf("send data [%s] end...\n", query);
-}
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -84,11 +43,15 @@ int main(int argc, char **argv) {
     if (connect_rt < 0) {
         error_handling(stderr, "connect failed");
     }
-    send_data(sock_fd);
-    sleep(1);
-    printf("close socket now...\n");
+
+    logging("write data now");
+    char msg[8000000];
+    send(sock_fd, msg, sizeof(msg), 0);
+
+    logging("close socket now");
     close(sock_fd);
-    sleep(5);
+    logging("close socket end...");
+    sleep(3);
 
     return 0;
 }
