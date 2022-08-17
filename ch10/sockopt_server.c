@@ -11,17 +11,22 @@
 #include <errno.h>
 #include "common/log.h"
 
-void read_data(int sockfd) {
-    ssize_t n;
-    char buf[102400];
+#define READ_SIZE 1024
 
-//    printf("input> ");
-//    getchar();
+void bind_and_listen(char *const *argv, int listen_fd);
+
+void read_data(int sock_fd, int flag) {
+    if (flag) {
+        printf("input> ");
+        getchar();
+    }
 
     long total = 0;
+    ssize_t n;
+    char buf[READ_SIZE];
     for (;;) {
         bzero(buf, sizeof(buf));
-        n = read(sockfd, buf, 102400);
+        n = read(sock_fd, buf, READ_SIZE);
         if (n == 0) {
             // End-of-File，表示 socket 关闭
             logging("client socket closed");
@@ -33,9 +38,6 @@ void read_data(int sockfd) {
             }
             error_logging(stderr, "read from socket error");
             break;
-        }
-        if (total <= 0) {
-            sleep(2);
         }
         total += n;
     }
@@ -49,9 +51,30 @@ int main(int argc, char **argv) {
     if (argc < 2) {
         error_handling(stderr, "Usage: sockopt_server <Port>");
     }
-    int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+    int flag = 0;
+    if (3 == argc) {
+        flag = 1;
+    }
 
-    struct sockaddr_in client_addr, server_addr;
+    int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+    bind_and_listen(argv, listen_fd);
+
+    struct sockaddr_in client_addr;
+    socklen_t client_len;
+    int client_fd;
+    for (;;) {
+        client_len = sizeof(client_addr);
+        client_fd = accept(listen_fd, (struct sockaddr *) &client_addr, &client_len);
+        read_data(client_fd, flag);
+        close(client_fd);
+    }
+
+    close(listen_fd);
+    return 0;
+}
+
+void bind_and_listen(char *const *argv, int listen_fd) {
+    struct sockaddr_in server_addr;
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(atoi(argv[1]));
@@ -63,16 +86,4 @@ int main(int argc, char **argv) {
     if (listen(listen_fd, 1024) == -1) {
         error_handling(stderr, "listen error");
     }
-
-    socklen_t client_len;
-    int client_fd;
-    for (;;) {
-        client_len = sizeof(client_addr);
-        client_fd = accept(listen_fd, (struct sockaddr *) &client_addr, &client_len);
-        read_data(client_fd);
-        close(client_fd);
-    }
-
-    close(listen_fd);
-    return 0;
 }

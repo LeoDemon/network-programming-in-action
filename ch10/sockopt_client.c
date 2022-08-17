@@ -11,11 +11,15 @@
 #include <errno.h>
 #include "common/log.h"
 
-# define MESSAGE_SIZE 1024000
+# define MESSAGE_SIZE 20000000
 
 void set_socket(int sock_fd, int linger_flag);
 
 void display_socket_opt(int sock_fd);
+
+void connect_server(char *const *argv, int sock_fd);
+
+void send_msg(int sock_fd);
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -32,6 +36,33 @@ int main(int argc, char **argv) {
     set_socket(sock_fd, linger_flag);
     display_socket_opt(sock_fd);
 
+    connect_server(argv, sock_fd);
+    send_msg(sock_fd);
+
+    logging("close socket now");
+    close(sock_fd);
+    logging("close socket end...");
+
+    return 0;
+}
+
+void send_msg(int sock_fd) {
+    char *msg = malloc(MESSAGE_SIZE + 1);
+    bzero(msg, MESSAGE_SIZE + 1);
+    for (long i = 0; i < MESSAGE_SIZE; ++i) {
+        msg[i] = '1';
+    }
+    logging("write data now");
+    ssize_t write_len = send(sock_fd, msg, MESSAGE_SIZE + 1, 0);
+    free(msg);
+
+    char msg2[100];
+    bzero(msg2, sizeof(msg2));
+    sprintf(msg2, "write data end: %lu", write_len);
+    logging(msg2);
+}
+
+void connect_server(char *const *argv, int sock_fd) {
     struct sockaddr_in serv_addr;
     bzero(&serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
@@ -43,17 +74,6 @@ int main(int argc, char **argv) {
     if (connect_rt < 0) {
         error_handling(stderr, "connect failed");
     }
-
-    logging("write data now");
-    char msg[8000000];
-    send(sock_fd, msg, sizeof(msg), 0);
-
-    logging("close socket now");
-    close(sock_fd);
-    logging("close socket end...");
-    sleep(3);
-
-    return 0;
 }
 
 void set_socket(int sock_fd, int linger_flag) {
