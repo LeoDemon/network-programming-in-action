@@ -41,15 +41,18 @@ int main(int argc, char **argv) {
         read_mask = all_reads;
         int rc = select(socket_fd + 1, &read_mask, NULL, NULL, NULL);
         if (rc < 0) {
-            error_handling(stderr, "select failed");
+            error_logging(stderr, "select failed");
+            break;
         }
 
         if (FD_ISSET(socket_fd, &read_mask)) {
             n = read(socket_fd, recv_line, MAX_LINE);
             if (n < 0) {
-                error_handling(stderr, "read data error");
+                error_logging(stderr, "read data error");
+                break;
             } else if (n == 0) {
-                error_handling(stderr, "server terminated");
+                error_logging(stderr, "server terminated");
+                break;
             }
             recv_line[n] = '\0';
             fputs(recv_line, stdout);
@@ -62,8 +65,9 @@ int main(int argc, char **argv) {
             }
             if (strncmp(send_line, "shutdown", 8) == 0) {
                 FD_CLR(0, &all_reads);
-                if (shutdown(socket_fd, 1)) {
-                    error_handling(stderr, "shutdown failed");
+                if (shutdown(socket_fd, SHUT_WR)) {
+                    error_logging(stderr, "shutdown failed");
+                    break;
                 }
             } else if (strncmp(send_line, "close", 5) == 0) {
                 FD_CLR(0, &all_reads);
@@ -80,12 +84,14 @@ int main(int argc, char **argv) {
                 printf("now sending: [%s]\n", send_line);
                 ssize_t rt = write(socket_fd, send_line, strlen(send_line));
                 if (rt < 0) {
-                    error_handling(stderr, "write data error");
+                    error_logging(stderr, "write data error");
+                    break;
                 }
                 printf("send bytes: %zu\n", rt);
             }
         }
     }
+    close(socket_fd);
 
     return 0;
 }

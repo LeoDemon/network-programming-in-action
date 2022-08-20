@@ -12,8 +12,8 @@
 
 static int count;
 
-static void sig_int(int signo) {
-    printf("received signal: %d\n", signo);
+static void sig_int(int sig_no) {
+    printf("received signal: %d\n", sig_no);
     printf("received %d datagrams.\n", count);
     exit(0);
 }
@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-    int ret = bind(listen_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    int ret = bind(listen_fd, (struct sockaddr *) &server_addr, sizeof(server_addr));
     if (ret < 0) {
         error_handling(stderr, "server socket bind failed");
     }
@@ -41,12 +41,12 @@ int main(int argc, char **argv) {
     }
 
     signal(SIGINT, sig_int);
-    signal(SIGPIPE, sig_int);
+    // signal(SIGPIPE, sig_int);
 
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
 
-    int conn_fd = accept(listen_fd, (struct sockaddr*)&client_addr, &client_len);
+    int conn_fd = accept(listen_fd, (struct sockaddr *) &client_addr, &client_len);
     if (conn_fd < 0) {
         error_handling(stderr, "server accept client socket failed");
     }
@@ -54,12 +54,14 @@ int main(int argc, char **argv) {
     char message[MAX_LINE];
     count = 0;
 
-    for(;;) {
+    for (;;) {
         ssize_t n = read(conn_fd, message, MAX_LINE);
         if (n < 0) {
-            error_handling(stderr, "read message error");
-        }else if (n == 0) {
-            error_handling(stderr, "client closed");
+            error_logging(stderr, "read message error");
+            break;
+        } else if (n == 0) {
+            error_logging(stderr, "client closed");
+            break;
         }
         message[n] = '\0';
         printf("received %zu bytes: [%s]\n", n, message);
@@ -74,9 +76,12 @@ int main(int argc, char **argv) {
         ssize_t write_nc = send(conn_fd, send_line, strlen(send_line), 0);
         printf("send %zu bytes: %s\n", write_nc, send_line);
         if (write_nc < 0) {
-            error_handling(stderr, "send message error");
+            error_logging(stderr, "send message error");
+            break;
         }
     }
+    close(conn_fd);
+    close(listen_fd);
 
     return 0;
 }
