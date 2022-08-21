@@ -92,8 +92,10 @@ int main(int argc, char **argv) {
             }
         }
     }
+    // sleep(5);
     error_logging(stdout, "close socket_fd now");
     close(socket_fd);
+    // sleep(5);
 
     return 0;
 }
