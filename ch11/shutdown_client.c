@@ -65,6 +65,7 @@ int main(int argc, char **argv) {
             }
             if (strncmp(send_line, "shutdown", 8) == 0) {
                 FD_CLR(0, &all_reads);
+                error_logging(stdout, "shutdown socket_fd now");
                 if (shutdown(socket_fd, SHUT_WR)) {
                     error_logging(stderr, "shutdown failed");
                     break;
@@ -91,6 +92,7 @@ int main(int argc, char **argv) {
             }
         }
     }
+    error_logging(stdout, "close socket_fd now");
     close(socket_fd);
 
     return 0;
