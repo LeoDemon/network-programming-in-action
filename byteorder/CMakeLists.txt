@@ -1,0 +1,5 @@
+add_executable(tcp_byte_order_client tcp_byte_order_client.c tcp_byte_order.h tcp_byte_order.c)
+target_link_libraries(tcp_byte_order_client tcp_ip_common)
+
+add_executable(tcp_byte_order_server tcp_byte_order_server.c tcp_byte_order.h tcp_byte_order.c)
+target_link_libraries(tcp_byte_order_server tcp_ip_common)
