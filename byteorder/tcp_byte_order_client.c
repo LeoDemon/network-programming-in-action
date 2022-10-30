@@ -15,14 +15,14 @@ void send_data(int socket_fd, int byte_order_flag) {
     struct message msg;
     bzero(&msg, sizeof(msg));
     strcpy(msg.buf, "abcdef好");
-    msg.message_length = strlen(msg.buf);
+    msg.len = strlen(msg.buf);
     // 字节序处理
     if (byte_order_flag) {
-        msg.message_length = htonl(msg.message_length);
+        msg.len = htonl(msg.len);
     }
     display_message(&msg);
 
-    unsigned int total_length = strlen(msg.buf) + sizeof(msg.message_length);
+    unsigned int total_length = strlen(msg.buf) + sizeof(msg.len);
     ssize_t n_written = send(socket_fd, &msg, total_length, 0);
     fprintf(stdout, "send into buffer: %ld\n", n_written);
     if (n_written != total_length) {

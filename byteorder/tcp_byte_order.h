@@ -8,7 +8,7 @@
 #include <arm/types.h>
 
 struct message {
-    u_int32_t message_length;
+    u_int32_t len;
     char buf[256];
 };
 

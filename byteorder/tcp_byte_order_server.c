@@ -40,21 +40,21 @@ void read_data(int sockfd, int byte_order_flag) {
     struct message msg;
     bzero(&msg, sizeof(msg));
 
-    size_t read_len_expect = sizeof(msg.message_length);
-    size_t read_len_actual = readn(sockfd, &msg.message_length, read_len_expect);
+    size_t read_len_expect = sizeof(msg.len);
+    size_t read_len_actual = readn(sockfd, &msg.len, read_len_expect);
     if (read_len_actual != read_len_expect) {
-        error_logging(stderr, "read msg.message_length error");
+        error_logging(stderr, "read msg.len error");
         return;
     }
 
     // 字节序处理
     if (byte_order_flag) {
-        msg.message_length = ntohl(msg.message_length);
+        msg.len = ntohl(msg.len);
     }
-    printf("msg.message_length: %d\n", msg.message_length);
+    printf("msg.len: %d\n", msg.len);
 
-    read_len_actual = readn(sockfd, &msg.buf, msg.message_length);
-    if (read_len_actual != msg.message_length) {
+    read_len_actual = readn(sockfd, &msg.buf, msg.len);
+    if (read_len_actual != msg.len) {
         error_logging(stderr, "read msg.buf error");
         return;
     }
