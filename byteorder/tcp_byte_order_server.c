@@ -53,6 +53,15 @@ void read_data(int sockfd, int byte_order_flag) {
     }
     printf("msg.len: %d\n", msg.len);
 
+    read_len_expect = sizeof(msg.type);
+    read_len_actual = readn(sockfd, &msg.type, read_len_expect);
+    if (read_len_actual != read_len_expect) {
+        error_logging(stderr, "read msg.type error");
+        return;
+    }
+    msg.type = ntohl(msg.type);
+    printf("msg.type: %d\n", msg.type);
+
     read_len_actual = readn(sockfd, &msg.buf, msg.len);
     if (read_len_actual != msg.len) {
         error_logging(stderr, "read msg.buf error");

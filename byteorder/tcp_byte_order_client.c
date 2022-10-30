@@ -20,9 +20,10 @@ void send_data(int socket_fd, int byte_order_flag) {
     if (byte_order_flag) {
         msg.len = htonl(msg.len);
     }
+    msg.type = htonl(1001);
     display_message(&msg);
 
-    unsigned int total_length = strlen(msg.buf) + sizeof(msg.len);
+    unsigned int total_length = strlen(msg.buf) + sizeof(msg.len) + sizeof(msg.type);
     ssize_t n_written = send(socket_fd, &msg, total_length, 0);
     fprintf(stdout, "send into buffer: %ld\n", n_written);
     if (n_written != total_length) {

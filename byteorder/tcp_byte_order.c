@@ -6,5 +6,5 @@
 #include "tcp_byte_order.h"
 
 void display_message(struct message *msg) {
-    printf("msg.buf=[%s], msg.length=[%d]\n", msg->buf, msg->len);
+    printf("msg.buf=[%s], msg.len=[%d], msg.type=[%d]\n", msg->buf, msg->len, msg->type);
 }

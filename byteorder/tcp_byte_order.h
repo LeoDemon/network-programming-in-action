@@ -9,6 +9,7 @@
 
 struct message {
     u_int32_t len;
+    u_int32_t type;
     char buf[256];
 };
 
