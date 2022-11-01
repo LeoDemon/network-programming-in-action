@@ -1,0 +1,5 @@
+add_executable(tcp_read_line_server tcp_read_line_server.c)
+target_link_libraries(tcp_read_line_server tcp_ip_common)
+
+add_executable(tcp_read_line_client tcp_read_line_client.c)
+target_link_libraries(tcp_read_line_client tcp_ip_common)
