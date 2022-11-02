@@ -21,8 +21,8 @@ size_t readline(int fd, char *buffer, size_t length) {
 
     bzero(read_buffer, sizeof(read_buffer));
     // input: abcefg\n
-    while (--length > 0) { //output: abcefg
-    //while (length-- > 0) { //output: abcefg\n  --> char array overflow
+    while (--length > 0) { // output: abcefg
+    // while (length-- > 0) { // output: abcefg\n  --> char array overflow
         if (n_left <= 0) {
             ssize_t n_read = recv(fd, read_buffer, sizeof(read_buffer) - 1, 0);
             printf("n_read: [%ld], [%s]\n", n_read, read_buffer);
