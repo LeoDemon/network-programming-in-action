@@ -52,7 +52,7 @@ void read_data(int sockfd, int byte_order_flag) {
         msg.len = ntohl(msg.len);
     }
     printf("msg.len: %d\n", msg.len);
-    if (msg.len > sizeof(msg.buf)) {
+    if (msg.len >= sizeof(msg.buf)) {
         error_logging(stderr, "msg.len is to large...");
         return;
     }
